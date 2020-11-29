@@ -16,75 +16,83 @@ public class SumMin {
     private int[][] matriz;
     private int[] solucion_temp;
     private int[] solucion;
-    private int costo, dimX, dimY, costo_temp, numMax = 0;
-
-    ;
-
+    private int costo,costo_temp, numMax = 0, tamMatriz;
+    
+    //Constructor
     public SumMin() {
         ingresarDatos();
     }
-
+    
+    //Método imprimir matriz de costes
     public void imprimir() {
         System.out.println("Matriz de costes:");
-        for (int i = 0; i < dimX; i++) {
-            for (int j = 0; j < dimY; j++) {
+        System.out.print("X ");
+        for (int i = 0; i< matriz.length;i++)
+            System.out.print(i+1+" ");
+        System.out.println("");
+        for (int i = 0; i < matriz.length; i++) {
+            System.out.print((char) (97 + i)+ " ");
+            for (int j = 0; j < matriz.length; j++) {
                 System.out.print(matriz[i][j] + " ");
             }
             System.out.println();
         }
         System.out.println("");
 
-//        for (int i = 0; i < solucion_temp.length; i++) {
-//            System.out.print(solucion_temp[i] + " ");
-//        }
-//        System.out.println("");
     }
-
+    
+    //Método calcular costo
     public void calcular_costo() {
         costo_temp = 0;
+        //Se suman los valores y se guardan en costo_temp
         for (int i = 0; i < solucion_temp.length; i++) {
             costo_temp += matriz[i][solucion_temp[i]];
         }
-//        System.out.println("Costo =" + costo_temp);
-
+        
+        /*En caso de costo_temp ser menor que costo, se reemplaza el valor del
+        costo y se copia el arreglo solucion_temp en el arreglo solucion */
         if (costo_temp < costo) {
             this.costo = costo_temp;
             this.solucion = (int[]) solucion_temp.clone();
         }
     }
-
+    
+    //Algoritmo Vuelta atrás
     public void vueltaAtras(int etapa) {
-        for (int i = 0; i < dimY; i++) {
+        for (int i = 0; i < matriz.length; i++) {
             if (aceptable(i, etapa)) {
                 this.solucion_temp[i] = etapa;
-                if (etapa == (dimY - 1)) {
-                    //imprimir();
+                if (etapa == (matriz.length - 1)) {
                     calcular_costo();
                 } else {
                     vueltaAtras(etapa + 1);
                 }
                 solucion_temp[i] = (numMax + 1);
-                //matriz[i][etapa]=0;
             }
 
         }
     }
-
+    
+    //Se valida si es una posición válida
     public boolean aceptable(int i, int etapa) {
-        //Validar filas
-        for (int j = 0; j < dimY; j++) {
+        /*Se valida que no ninguna persona tenga esa tarea asignada, es decir
+        se validan las filas*/
+        for (int j = 0; j < solucion_temp.length; j++) {
             if (solucion_temp[j] == etapa) {
                 return false;
             }
         }
-        //Validar columnas
+        /*Se valida que la tarea aun no este asignana a ninguna persona, es decir
+        se validan las columnas*/
         if (solucion_temp[i] != (numMax + 1)) {
             return false;
         }
-
+        
         return true;
     }
-
+    
+    /*Metódo que llama al método imprimir, inicia el backtraking e imprime el
+    resultado*/
     public void resolver() {
         imprimir();
         vueltaAtras(0);
@@ -95,22 +103,19 @@ public class SumMin {
         System.out.println("Coste total:" + costo);
 
     }
-
+    //Método de captura los datos de la matriz de costes.
     public void ingresarDatos() {
         Scanner reader = new Scanner(System.in);
-        System.out.println("Ingrese el número de personas");
-        this.dimX = reader.nextInt();
+        System.out.println("Ingrese el número de personas y tareas: ");
+        this.tamMatriz = reader.nextInt();
 
-        System.out.println("Ingrese el número de tareas");
-        this.dimY = reader.nextInt();
+        this.matriz = new int[tamMatriz][tamMatriz];
+        this.solucion_temp = new int[tamMatriz];
+        this.solucion = new int[tamMatriz];
 
-        this.matriz = new int[dimX][dimY];
-        this.solucion_temp = new int[dimY];
-        this.solucion = new int[dimY];
-
-        for (int i = 0; i < dimX; i++) {
-            for (int j = 0; j < dimY; j++) {
-                System.out.print("Ingrese la tarifa de la persona " + (char) (97 + i) + " para la tarea " + (j + 1) + ":");
+        for (int i = 0; i < tamMatriz; i++) {
+            for (int j = 0; j < tamMatriz; j++) {
+                System.out.print("Ingrese la tarifa de la persona " + (char) (97 + i) + " para la tarea " + (j + 1) + ": ");
                 matriz[i][j] = reader.nextInt();
 
                 if (i == 0 && j == 0) {
@@ -120,16 +125,15 @@ public class SumMin {
                         this.numMax = matriz[i][j];
                     }
                 }
-
             }
         }
-        
-        this.costo = (numMax*dimY)+1;
+        System.out.println("");
+        this.costo = (numMax * tamMatriz) + 1;
         for (int i = 0; i < solucion_temp.length; i++) {
             solucion_temp[i] = numMax + 1;
         }
     }
-
+    
     public static void main(String[] args) {
         SumMin sumMin = new SumMin();
         sumMin.resolver();
